@@ -1,0 +1,166 @@
+*** BASIC QUERIES ***
+
+# To bring up the data
+
+SELECT *
+FROM category
+
+# Finding specific items 
+
+## By Name
+
+SELECT *
+FROM film
+WHERE title = 'Title Name'
+
+## Using Like
+
+SELECT * FROM film
+WHERE title LIKE
+'%Uptown%'
+
+
+# Update / Delete Data 
+
+UPDATE film_category
+SET category_id = 20
+WHERE film_id = 5
+
+DELETE
+FROM film_category
+WHERE category_id = 21
+
+# Searching with multiple factors using 'AND'
+
+SELECT Title,
+length, rental_rate
+FROM film
+WHERE length >120
+AND Rental_Rate >2.99
+
+## Using Between
+
+SELECT title,
+rental_duration
+FROM film
+WHERE rental_duration
+BETWEEN 3 AND 7
+
+## Using OR
+
+SELECT title,
+description,rating
+FROM film
+WHERE rating = 'PG'
+OR rating = 'G
+
+# Using GROUP BY CLAUSE
+
+SELECT film_id, title, description, rating,
+COUNT(film_id) AS count_of_movies
+From film
+WHERE rating = 'PG'
+OR rating = 'G'
+Group by (film_id)
+
+# AVG, MIN, MAX
+
+SELECT film_id, title, description, rating,
+AVG(rental_rate) AS Average_movie_rental_rate
+From film
+WHERE rating = 'PG'
+OR rating = 'G'
+Group by (film_id)
+
+SELECT film_id, title, description, rating,
+MAX(rental_duration) AS maximum_rental_duration
+From film
+WHERE rating = 'PG'
+OR rating = 'G'
+Group by (film_id)
+
+SELECT film_id, title, description, rating,
+MIN(rental_duration) AS minimum_rental_duration
+From film
+WHERE rating = 'PG'
+OR rating = 'G'
+Group by (film_id)
+
+## Combining Min/Max
+
+SELECT film_id, title,
+AVG(rental_rate) AS average_movie_rental_rate,
+COUNT(film_id) AS count_movie_rental_rate,
+MAX(rental_duration) AS maximum_rental_duration,
+MIN(rental_duration) AS minimum_rental_duration
+From film
+WHERE rating = 'PG'
+OR rating = 'G'
+Group by (film_id)
+
+## Numerical details for a specific category
+
+SELECT MIN(film_id),
+MAX(film_id),
+AVG(film_id)
+FROM film;
+
+# Finding the Mode (Non Numerical Data)
+
+SELECT mode() WITHIN GROUP
+(ORDER BY title) FROM film;
+
+# Missing Data
+
+SELECT * FROM film
+WHERE Rating is NULL
+
+
+
+
+*** COMPLEX QUERIES ***
+
+# Using Joins
+
+
+
+SELECT D.country,
+ COUNT(customer_id) as Count_of_Customers
+FROM customer A
+INNER JOIN address B ON A.address_id = B.address_id
+INNER JOIN city C ON B.city_id = C.city_id
+INNER JOIN country D ON C.country_ID = D.country_ID
+GROUP BY country
+ORDER by Count_of_Customers DESC
+Limit 10
+
+
+WITH top_5_customers_cte AS
+(Select E.Customer_id,
+ D.first_name,
+ D.last_name,
+ E.customer_id,
+ A.Country,
+ B.City,
+ SUM(amount) as Total_Amount_Paid
+ FROM Country A
+ INNER JOIN City B ON A.country_id = B.country_id
+ INNER JOIN Address C on B.city_id = C.city_id
+ INNER JOIN Customer D ON C.address_id = D.address_id
+ INNER JOIN Payment E ON D.customer_id = E.customer_id
+ WHERE City In ('Saint-Denis','Cape Coral','Santa Brbara
+dOeste','Apeldoorn','Molodetno','Qomsheh','London','Memphis','Richmond Hill','Tanza')
+ GROUP BY E.customer_id,D.first_name,D.Last_name, A.Country,B.City,E.Amount
+ Order by E.Amount DESC
+ LIMIT 5)
+Select D.Country,
+COUNT (A.Customer_ID) as All_Customer_Count,
+COUNT (DISTINCT Top_5_Customers_cte.Country) AS top_customer_count
+FROM Customer A
+INNER JOIN Address B ON A.Address_ID = B.Address_ID
+INNER JOIN City C on B.City_ID = C.City_ID
+INNER JOIN Country D on C.Country_ID = D.Country_ID
+LEFT JOIN top_5_customers_cte ON D.Country = top_5_customers_cte.country
+GROUP BY D.Country, top_5_customers_cte.Country
+ORDER BY top_5_customers_cte.country
+LIMIT 5
