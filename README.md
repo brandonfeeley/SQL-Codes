@@ -1,5 +1,7 @@
 # SQL-Codes
 
+LAST UPDATED JUNE 14TH
+
 These are some of codes used from SQL.
 
-I didn't use SQL as much as Python but I have a basic understanding from doing the CareerFoundry course
+I am working on putting together a more detailed brief using W3schools
